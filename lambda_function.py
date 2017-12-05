@@ -19,8 +19,7 @@ def lambda_handler(event, context):
         if "text" in params:
             text = params['text'][0]
     except:
-        return None
-        #return post_the_agenda()
+        return post_the_agenda()
     
     if command == '/bay':
         return handle_bay_command(user, text, team_domain)

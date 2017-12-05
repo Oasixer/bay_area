@@ -12,6 +12,7 @@ def lambda_handler(event, context):
     try:
         params = parse_qs(event['body'])
         user = params['user_id'][0]
+        user_name = params['user_name'][0]
         command = params['command'][0]
         team_domain = params['team_domain'][0]
         text = ""
@@ -24,7 +25,7 @@ def lambda_handler(event, context):
     if command == '/bay':
         return handle_bay_command(user, text, team_domain)
     elif command == '/agenda':
-        return handle_agenda_command(user, text, team_domain)
+        return handle_agenda_command(user, user_name, text, team_domain)
     elif command == '/todo':
         return handle_todo_command(user, text, team_domain)
     elif command == 'postit':

@@ -1,17 +1,18 @@
-import boto3
 import json
 import pycurl
 import StringIO
 import urllib
 import random
 import time
+import decimal
 
 from oauth_secret import oauth_token
+from wrt_dynamodb_handler import *
 from wrt_lists import *
 from wrt_respond import *
 
 
-def handle_agenda_command(user, text, team_domain):
+def handle_agenda_command(user, user_name, text, team_domain):
     if text == "":
         return get_all_agenda_items(False)
     elif text == "all" and user == 'U2W19KS75':
@@ -28,102 +29,66 @@ def handle_agenda_command(user, text, team_domain):
 def clear_all_items():
     items = get_weekly_items()
     items_to_delete = {}
-    for i in range(items['Count']):
-        items_to_delete[items['Items'][i]['pri']] = items['Items'][i]['agenda']
+    for i in items:
+        items_to_delete[i['pri']] = i['agenda']
     if len(items_to_delete) > 0:
-        return delete_items_by_key(items_to_delete)
+        deleted = delete_items_by_key(items_to_delete, "WRT_agenda", "pri", "agenda")
+        return respond(None, "deleted %s items" % deleted)
     else:
         return respond(None, "no items to delete")
         
 def clear_user_items(user_name):
     items = get_weekly_items()
     items_to_delete = {}
-    for i in range(items['Count']):
-        if items['Items'][i]['agenda'].endswith('(' + user_name + ')') and not items['Items'][i]['agenda'].startswith('[deleted]'):
-            items_to_delete[items['Items'][i]['pri']] = items['Items'][i]['agenda']
+    for i in items:
+        if i['agenda'].endswith('(' + user_name + ')') and not i['agenda'].startswith('[deleted]'):
+            items_to_delete[i['pri']] = i['agenda']
     if len(items_to_delete) > 0:
-        return delete_items_by_key(items_to_delete)
+        deleted = delete_items_by_key(items_to_delete, "WRT_agenda", "pri", "agenda")
+        return respond(None, "deleted %s items" % deleted)
     else:
         return respond(None, "you have no items, so none were deleted")
-    return respond(None, str(items_to_delete))
-
-def delete_items_by_key(items):
-    dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table('WRT_agenda')
-    items_deleted = len(items)
-    for i in items:
-        primary = sorted(items.iterkeys())[0]
-        text = items[i ]
-        if text.startswith('[deleted]'):
-            items_deleted -= 1
-            continue
-        response = table.update_item(
-            Key = {
-                'pri' : i
-            },
-            AttributeUpdates = {
-                'agenda' : {
-                    'Value' : str('[deleted] ' + text),
-                    'Action' : 'PUT'
-                }
-            }
-        )
-    return respond(None, "deleted %s items" % items_deleted)
 
 def delete_item_by_index(user, user_name, index):
     items = get_weekly_items()
     items_map = {}
-    for i in range(items['Count']):
-        if items['Items'][i]['agenda'].startswith('[deleted]'):
-            continue
-        items_map[items['Items'][i]['pri']] = items['Items'][i]['agenda']
+    for i in items:
+        items_map[i['pri']] = i['agenda']
         
     if index < 0 or index >= len(sorted(items_map.iterkeys())):
         return respond(None, "index out of range")
     key = sorted(items_map.iterkeys())[index]
     if not items_map[key].endswith('(' + user_name + ')'):
         return respond(None, "That item doesn't belong to you")
-    return delete_items_by_key({key: items_map[key]})
+    deleted = delete_items_by_key({key: items_map[key]}, "WRT_agenda", "pri", "agenda")
+    return respond(None, "deleted %s items" % deleted)
 
 def put_item_in_agenda(text, user_name):
-    
     item = text + ' (' + user_name + ')' #attach user name to agenda items
     created_at = decimal.Decimal(time.time())
-    dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table('WRT_agenda')
-    table.put_item(
-        Item = { 
-            'pri': created_at,
-            'created_at' : created_at,
-            'agenda' : item
-        })
+    Item = { 
+        'pri': created_at,
+        'created_at' : created_at,
+        'agenda' : item
+    }
+    put_item_in_table(Item, "WRT_agenda")
     
     return respond(None, "added: " + item)
     
 def get_weekly_items():
     end_time = decimal.Decimal(time.time())
     start_time = decimal.Decimal(end_time - 604800) #that many seconds in a week
-    dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table('WRT_agenda')
-    
-    return table.scan(
-        Select = 'ALL_ATTRIBUTES',
-        FilterExpression = boto3.dynamodb.conditions.Attr('created_at').between(start_time,end_time)
-        )
+    filter_object = lambda x: x['created_at'] > start_time
+    return get_items_from_table('WRT_agenda', filter_object, 'agenda')
 
 def get_all_agenda_items(admin):
     response = get_weekly_items()
-
-    count = response['Count']
-    
     items = {}
-    for i in range(count):
-        items[str(float(response['Items'][i]['created_at']))] = response['Items'][i]['agenda'].strip('"')
+    for i in response:
+        items[str(float(i['created_at']))] = i['agenda'].strip('"')
     
     sorted_items = []
     for i in sorted(items.iterkeys()):
-        if items[i].startswith('[deleted]') and not admin:
-            continue
         sorted_items.append(items[i])
     if len(sorted_items) == 0:
         return respond(None, "there are no agenda items")

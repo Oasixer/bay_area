@@ -1,8 +1,8 @@
-import boto3
 import time
 import decimal
 
 from wrt_respond import *
+from wrt_dynamodb_handler import *
 
 def handle_todo_command(user, text, team_domain):
     if text == "":
@@ -17,11 +17,9 @@ def handle_todo_command(user, text, team_domain):
 def get_all_todo_items_pretty(user):
     response = get_all_todo_items(user)
 
-    count = response['Count']
-    
     items = {}
-    for i in range(count):
-        items[str(float(response['Items'][i]['time_added']))] = response['Items'][i]['todo_item'].strip('"')
+    for i in response:
+        items[str(float(i['time_added']))] = i['todo_item'].strip('"')
     
     sorted_items = []
     for i in sorted(items.iterkeys()):
@@ -37,66 +35,38 @@ def get_all_todo_items_pretty(user):
     return respond(None, return_string)
 
 def get_all_todo_items(user):
-    dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table('WRT_todo')
-
-    return table.scan(
-        Select = 'ALL_ATTRIBUTES',
-        FilterExpression = boto3.dynamodb.conditions.Attr('User_ID').eq(user))
+    return get_items_from_table('WRT_todo', lambda x: x['User_ID'] == user, 'todo_item')
 
 def clear_todo_items(user):
     items = get_all_todo_items(user)
     items_to_delete = {}
-    for i in range(items['Count']):
-        items_to_delete[items['Items'][i]['time_added']] = items['Items'][i]['todo_item']
-    if len(items_to_delete) > 0:
-        return delete_todo_by_key(items_to_delete)
-    return respond(None, "no todo items to delete")
-
-def delete_todo_by_key(items):
-    dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table('WRT_todo')
-    items_deleted = len(items)
     for i in items:
-        primary = sorted(items.iterkeys())[0]
-        text = items[i]
-        if text.startswith('[deleted]'):
-            items_deleted -= 1
-            continue
-        response = table.update_item(
-            Key = {
-                'time_added' : i
-            },
-            UpdateExpression = 'SET todo_item = :t',
-            ExpressionAttributeValues = {
-                ':t' : '[deleted] ' + text
-            }
-        )
-    return respond(None, "deleted %s items" % items_deleted)
+        items_to_delete[i['time_added']] = i['todo_item']
+    if len(items_to_delete) > 0:
+        deleted = delete_items_by_key(items_to_delete, "WRT_todo", "time_added", "todo_item")
+        return respond(None, "deleted %s items" % deleted)
+    return respond(None, "no todo items to delete")
 
 def delete_todo_by_index(user, index):
     items = get_all_todo_items(user)
     items_map = {}
-    for i in range(items['Count']):
-        if items['Items'][i]['todo_item'].startswith('[deleted]'):
-            continue
-        items_map[items['Items'][i]['time_added']] = items['Items'][i]['todo_item']
+    for i in items:
+        items_map[i['time_added']] = i['todo_item']
         
     if index < 0 or index >= len(sorted(items_map.iterkeys())):
         return respond(None, "index out of range")
     key = sorted(items_map.iterkeys())[index]
-    return delete_todo_by_key({key: items_map[key]})
+    deleted = delete_items_by_key({key: items_map[key]}, "WRT_todo", "time_added", "todo_item")
+    return respond(None, "deleted %s items" % deleted)
 
 def add_todo_item(user, text):
     item = text
     time_added = decimal.Decimal(time.time())
-    dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table('WRT_todo')
-    table.put_item(
-        Item = { 
-            'time_added': time_added,
-            'todo_item' : item,
-            'User_ID' : user
-        })
+    Item = { 
+        'time_added': time_added,
+        'todo_item' : item,
+        'User_ID' : user
+    }
+    put_item_in_table(Item, "WRT_todo")
     
     return respond(None, "added: " + item)

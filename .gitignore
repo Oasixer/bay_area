@@ -1,1 +1,2 @@
-oauth.py
+oauth_secret.py
+*.zip

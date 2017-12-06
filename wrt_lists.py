@@ -26,7 +26,7 @@ BAY_LEAVE_EMOJI_LIST = [":feelsbadman:",
                         ":rip:",
                         ":sob:",
                         ":robin:"]
-ignore_list = [] #Stefan is now not ignored
+ignore_list = [] # Users in this list (identified by user ID) will not show up in "/bay who"
 agenda_react_emojis = [":acetone:", ":actually_ham:", ":adam:", ":addreaction:", ":alex:", ":alsoham:", ":anarchist:", ":aristotle:", ":axe:", ":banan:", 
                         ":beret:", ":blackspace:", ":bone_ana:", ":broom:", ":chill:", ":cinnamon:", ":comrade:", ":cosin:", ":cute:", ":cuter:", ":cutest:", 
                         ":dab:", ":damn:", ":david:", ":diode:", ":doris:", ":dragoncurve:", ":drill:", ":em:", ":em1:", ":em2:", ":em3:", ":em4:", ":emily:", 

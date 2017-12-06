@@ -26,7 +26,7 @@ BAY_LEAVE_EMOJI_LIST = [":feelsbadman:",
                         ":rip:",
                         ":sob:",
                         ":robin:"]
-ignore_list = ['U5P2M60AK'] #Stephan is now ignored
+ignore_list = [] #Stefan is now not ignored
 agenda_react_emojis = [":acetone:", ":actually_ham:", ":adam:", ":addreaction:", ":alex:", ":alsoham:", ":anarchist:", ":aristotle:", ":axe:", ":banan:", 
                         ":beret:", ":blackspace:", ":bone_ana:", ":broom:", ":chill:", ":cinnamon:", ":comrade:", ":cosin:", ":cute:", ":cuter:", ":cutest:", 
                         ":dab:", ":damn:", ":david:", ":diode:", ":doris:", ":dragoncurve:", ":drill:", ":em:", ":em1:", ":em2:", ":em3:", ":em4:", ":emily:", 

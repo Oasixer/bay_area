@@ -1,4 +1,7 @@
 from urlparse import parse_qs
+import logging
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 #our files
 from oauth_secret import oauth_token
@@ -18,7 +21,9 @@ def lambda_handler(event, context):
         text = ""
         if "text" in params:
             text = params['text'][0]
+        logger.info('%s (id %s) sent command %s to domain %s with text %s' % (user_name, user, command, team_domain, text))
     except:
+        logger.error('couldn\'t parse event{}'.format(event))
         return post_the_agenda()
     
     if command == '/bay':

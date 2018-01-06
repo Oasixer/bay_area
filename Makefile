@@ -1,6 +1,15 @@
 ZIPNAME = lambda
 
+PYTHON_FILES  = lambda_function.py
+PYTHON_FILES += oauth_secret.py
+PYTHON_FILES += wrt_agenda_command.py
+PYTHON_FILES += wrt_bay_command.py
+PYTHON_FILES += wrt_dynamodb_handler.py
+PYTHON_FILES += wrt_lists.py
+PYTHON_FILES += wrt_respond.py
+PYTHON_FILES += wrt_todo_command.py
+
 .PHONY: all
 all:
 	-rm $(ZIPNAME).zip
-	zip $(ZIPNAME) *.py
+	zip $(ZIPNAME) $(PYTHON_FILES)

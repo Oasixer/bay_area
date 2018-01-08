@@ -1,0 +1,21 @@
+#!/bin/bash
+
+#bash script for interacting with the bay area command from the command line
+#you need to fill in the USER and USER_NAME variables below for this to work
+
+COMMAND=x
+
+[[ $0 == *bay ]] && COMMAND=/bay
+[[ $0 == *todo ]] && COMMAND=/todo
+[[ $0 == *agenda ]] && COMMAND=/agenda
+[[ $COMMAND == x ]] && exit 1
+
+DOMAIN=waterloorocketry
+USER=
+USER_NAME=
+ARGS=$1
+
+DATA="-d team_domain=$DOMAIN&user_name=$USER_NAME&user_id=$USER&command=$COMMAND&text=$ARGS"
+
+curl -sX POST -H 'Content-Type: application/x-www-form-urlencoded' https://jsvgcxgxt8.execute-api.us-east-1.amazonaws.com/prod/wrt_slack_bay $DATA \
+    | python -c "import json;print json.loads(raw_input())[\"text\"]"

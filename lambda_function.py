@@ -24,7 +24,7 @@ def lambda_handler(event, context):
         logger.info('%s (id %s) sent command %s to domain %s with text %s' % (user_name, user, command, team_domain, text))
     except:
         logger.error('couldn\'t parse event{}'.format(event))
-        return post_the_agenda()
+        return respond(None, "couldn't parse input")
     
     if command == '/bay':
         return handle_bay_command(user, text, team_domain)

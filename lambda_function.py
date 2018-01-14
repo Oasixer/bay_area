@@ -7,7 +7,7 @@ logger.setLevel(logging.INFO)
 from oauth_secret import oauth_token
 from wrt_lists import *
 from wrt_bay_command import handle_bay_command
-from wrt_agenda_command import handle_agenda_command, post_the_agenda
+from wrt_agenda_command import handle_agenda_command, post_the_agenda, clear_all_items
 from wrt_todo_command import handle_todo_command
 from wrt_respond import *
 
@@ -34,5 +34,7 @@ def lambda_handler(event, context):
         return handle_todo_command(user, text, team_domain)
     elif command == 'postit':
         return post_the_agenda()
+    elif command == 'cron_clearit':
+        return clear_all_items()
     else:
         return respond(None, "unknown command")

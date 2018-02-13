@@ -27,16 +27,5 @@ BAY_LEAVE_EMOJI_LIST = [":feelsbadman:",
                         ":sob:",
                         ":robin:"]
 ignore_list = [] # Users in this list (identified by user ID) will not show up in "/bay who"
-agenda_react_emojis = [":acetone:", ":actually_ham:", ":adam:", ":addreaction:", ":alex:", ":alsoham:", ":anarchist:", ":aristotle:", ":axe:", ":banan:", 
-                        ":beret:", ":blackspace:", ":bone_ana:", ":broom:", ":chill:", ":cinnamon:", ":comrade:", ":cosin:", ":cute:", ":cuter:", ":cutest:", 
-                        ":dab:", ":damn:", ":david:", ":diode:", ":doris:", ":dragoncurve:", ":drill:", ":em:", ":em1:", ":em2:", ":em3:", ":em4:", ":emily:", 
-                        ":failfish:", ":feelsbadman:", ":fox:", ":fpaacs:", ":gain:", ":god:", ":gold:", ":goodstuff:", ":goose:", ":greatstuff:", ":ham:", 
-                        ":hellothere:", ":hilbert:", ":hilbertcurve:", ":hilberto:", ":hilly:", ":hotstrippers:", ":hussein:", ":infinity:", ":jacob:", ":julia:", 
-                        ":kappa:", ":kenneth:", ":koch:", ":lad:", ":lambda:", ":logo:", ":logo2:", ":mandelbrot:", ":mandelbrotrainbow:", ":matrix:", ":maxq:", 
-                        ":maxrobin:", ":mcteerts:", ":menger:", ":meowth:", ":miranda:", ":monkas:", ":newhire:", ":nick:", ":nina:", ":ninasback:", ":nofrills:", 
-                        ":noosejs:", ":nugget:", ":nylon:", ":ohgod:", ":opvote:", ":pain:", ":parrot:", ":partyparrot:", ":paylad:", ":pita:", ":pjsalt:", ":pogchamp:", 
-                        ":polymethlymethacrylate:", ":praxair:", ":psi:", ":q:", ":rip:", ":robin:", ":ryan:", ":ryerson:", ":sadparrot:", ":sanic:", ":shufflelogo:", ":shufflelogo2:", 
-                        ":shuffleparrot:", ":shuffleparrot2:", ":sierpinski:", ":sin:", ":siren:", ":sledge:", ":slowpoke:", ":subtle:", ":syzygy:", ":thonking_foce:", ":tru:", ":trump:", 
-                        ":truss:", ":upvote:", ":uwin:", ":vdar1:", ":vdar10:", ":vdar11:", ":vdar12:", ":vdar13:", ":vdar2:", ":vdar3:", ":vdar4:", ":vdar5:", ":vdar6:", 
-                        ":vdar7:", ":vdar8:", ":vdar9:", ":vithusan:", ":whitespace:", ":wonk:", ":wow:", ":wreckingball:", ":wtf:", ":wtfdiagram:", ":wutface:", 
-                        ":yash:", ":yiqing:", ":zak:"]
+
+agenda_react_emojis = [":_anguished:", ":_blush:", ":_disappointed:", ":_eyes:", ":_heart:", ":_heart_eyes:", ":_kissing_heart:", ":_neutral_face:", ":_no_mouth:", ":_open_mouth:", ":_scream:", ":_smile:", ":_smirk:", ":_sob:", ":_sweat:", ":_thinking_face:", ":_turtle:", ":_upside_down_face:", ":_white_frowning_face:"]

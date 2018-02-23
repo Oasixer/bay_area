@@ -4,6 +4,8 @@ import re
 
 from wrt_respond import *
 from wrt_dynamodb_handler import *
+from wrt_usernames import wrt_names_to_ids, wrt_ids_to_names
+from wrt_slack_handler import send_dm
 
 def handle_todo_command(user, text, team_domain):
     if text == "":
@@ -13,8 +15,21 @@ def handle_todo_command(user, text, team_domain):
     elif text.startswith("remove") and len(text.split(' ')) == 2 and text.split(' ')[1].isdigit():
         return delete_todo_by_index(user, int(text.split(' ')[1]) - 1)
     else:
+        #check if this is a tagged todo item
         m = re.search(r"^\[([^\]]*)\](.*)$", text);
         if m and len(m.group(1).strip()) > 0 and len(m.group(2).strip()) > 0:
+            #check if this todo item has been assigned to anyone
+            n = re.findall("(?<=@)\w+|(?<=\()\w+(?=\))", text)
+            #check that every found mention does exist
+            for i in n:
+                if not i in wrt_names_to_ids:
+                    return respond(None, "I don't know who \"%s\" is" % i)
+            #notify everyone in that message that a todo item has been handed to them
+
+            notification = "%s has given you a todo item in [%s]:\n  - %s" % (wrt_ids_to_names[user] if user in wrt_ids_to_names else user, m.group(1).strip(), m.group(2).strip())
+            for i in n:
+                send_dm(wrt_names_to_ids[i], notification)
+
             return add_todo_item(user, m.group(2).strip(), m.group(1).strip());
         return add_todo_item(user, text)
 

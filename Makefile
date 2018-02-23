@@ -8,6 +8,8 @@ PYTHON_FILES += wrt_dynamodb_handler.py
 PYTHON_FILES += wrt_lists.py
 PYTHON_FILES += wrt_respond.py
 PYTHON_FILES += wrt_todo_command.py
+PYTHON_FILES += wrt_slack_handler.py
+PYTHON_FILES += wrt_usernames.py
 
 .PHONY: all
 all:

@@ -2,10 +2,9 @@ from wrt_respond import *
 from oauth_secret import oauth_token
 from wrt_lists import *
 import json
-import pycurl
-import urllib
-import StringIO
 import random
+
+from wrt_slack_handler import get_status, set_status, api_handler
 
 def handle_bay_command(user, text, team_domain):
     if text == "":
@@ -37,27 +36,10 @@ def handle_bay_command(user, text, team_domain):
 
 
 def get_current_status(user, team_domain):
-    c = pycurl.Curl()
-    url = 'https://' + team_domain + '.slack.com/api/users.profile.get?token=' + oauth_token + '&user=' + user
-    url = url.decode('utf-8').encode('ascii')
-    c.setopt(c.URL, url)
-    buffer = StringIO.StringIO()
-    c.setopt(c.WRITEFUNCTION, buffer.write)
-    c.perform()
-    c.close()
-    return json.loads(buffer.getvalue())['profile']['status_text']
+    return get_status(user)
     
 def set_current_status(user, team_domain, status_text, status_emoji):
-    c = pycurl.Curl()
-    url = 'https://' + team_domain + '.slack.com/api/users.profile.set?token=' + oauth_token + '&user=' + user +\
-            '&profile=' + urllib.quote_plus('{"status_emoji":"' + status_emoji + '","status_text":"' + status_text + '"}')
-    url = url.decode('utf-8').encode('ascii')
-    c.setopt(c.URL, url)
-    buffer = StringIO.StringIO()
-    c.setopt(c.WRITEFUNCTION, buffer.write)
-    c.perform()
-    c.close()
-    json_data = json.loads(buffer.getvalue())
+    json_data = set_status(user, status_text, status_emoji)
     if user in DEBUG_LIST:
         return json.dumps(json_data)
     if (not "ok" in json_data) or (not json_data["ok"]):
@@ -65,15 +47,7 @@ def set_current_status(user, team_domain, status_text, status_emoji):
     return "changed your status to " + status_emoji + " " + status_text
 
 def list_of_people_in_bay(team_domain, human_readable):
-    c = pycurl.Curl()
-    url = 'https://' + team_domain + '.slack.com/api/users.list?token=' + oauth_token
-    url = url.decode('utf-8').encode('ascii')
-    c.setopt(c.URL, url)
-    buffer = StringIO.StringIO()
-    c.setopt(c.WRITEFUNCTION, buffer.write)
-    c.perform()
-    c.close()
-    members = json.loads(buffer.getvalue())['members']
+    members = api_handler('users.list')['members']
     list_bay = []
     for i in members:
         if (not (i['id'] in ignore_list)) and "profile" in i and "status_emoji" in i['profile'] and i['profile']['status_emoji'] == ':rocket:':

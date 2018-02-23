@@ -1,7 +1,3 @@
-import json
-import pycurl
-import StringIO
-import urllib
 import random
 import time
 import decimal
@@ -10,6 +6,7 @@ from oauth_secret import oauth_token
 from wrt_dynamodb_handler import *
 from wrt_lists import *
 from wrt_respond import *
+from wrt_slack_handler import post_to_general
 
 
 def handle_agenda_command(user, user_name, text, team_domain):
@@ -104,18 +101,8 @@ def post_the_agenda():
     message += "\n\n React with a " + random.choice(agenda_react_emojis) + " if you're coming"
     post_to_channel(message)
 
-channel_id='C07MWEYPR'
 def post_to_channel(message):
-    c = pycurl.Curl()
-    url = 'https://waterloorocketry.slack.com/api/chat.postMessage?token=' + \
-        oauth_token + '&channel=' + channel_id + '&text=' + urllib.quote_plus(message)
-    url = url.decode('utf-8').encode('ascii')
-    c.setopt(c.URL, url)
-    buffer = StringIO.StringIO()
-    c.setopt(c.WRITEFUNCTION, buffer.write)
-    c.perform()
-    c.close()
-    json_data = json.loads(buffer.getvalue())
+    json_data = post_to_general(message)
     if 'ok' in json_data and json_data['ok']:
         return respond(None, "yep. Posted a thing.")
     return respond(None, "something failed. You figure it out: " + str(json_data))

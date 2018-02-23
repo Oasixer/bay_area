@@ -5,6 +5,7 @@ import re
 from wrt_respond import *
 from wrt_dynamodb_handler import *
 from wrt_usernames import wrt_names_to_ids, wrt_ids_to_names
+from wrt_lists import channels_map
 from wrt_slack_handler import send_dm
 
 def handle_todo_command(user, text, team_domain):
@@ -16,7 +17,7 @@ def handle_todo_command(user, text, team_domain):
         return delete_todo_by_index(user, int(text.split(' ')[1]) - 1)
     else:
         #check if this is a tagged todo item
-        m = re.search(r"^\[([^\]]*)\](.*)$", text);
+        m = re.search(r"^\[([^\]]*)\](.*)$", text)
         if m and len(m.group(1).strip()) > 0 and len(m.group(2).strip()) > 0:
             #check if there exist multiple todo items
             n = re.findall('(?<={)[^}]+(?=})', m.group(2).strip())
@@ -26,6 +27,24 @@ def handle_todo_command(user, text, team_domain):
                 for i in n:
                     add_todo_item(user, i, m.group(1).strip())
                 return "added %i todo items" % len(n)
+
+        #check if this is a channel post request
+        m = re.search('^#(\w+).*\[([^\]]+)\]', text)
+        if m:
+            channel_name = m.group(1)
+            tag = m.group(2).strip()
+            if not channel_name in channels_map:
+                return respond(NameError("#%s isn't a channel" % channel_name))
+            items = get_todo_items_by_tag(tag)
+            if len(items) == 0:
+                return respond(NameError("there are no todo items under tag [%s]" % tag))
+            response_string = "Todo items under [%s]:\n" % tag
+            for i in items:
+                response_string += "\n    - %s" % i
+
+            send_dm(channels_map[channel_name], response_string)
+            return respond(None, "done")
+            
         return add_todo_item(user, text)
 
 def get_all_todo_items_pretty(user):
@@ -65,6 +84,14 @@ def get_all_todo_items_pretty(user):
 
 def get_all_todo_items(user):
     return get_items_from_table('WRT_todo', lambda x: ('tag' in x and (x['tag'] != 'personal' or x['User_ID'] == user)) or ('tag' not in x and x['User_ID'] == user), 'todo_item')
+
+def get_todo_items_by_tag(tag):
+    items = get_all_todo_items("XXXX")
+    clean_items = []
+    for i in items:
+        if 'tag' in i and i['tag'] == tag:
+            clean_items.append(i['todo_item'])
+    return clean_items
 
 def clear_todo_items(user):
     items = get_all_todo_items(user)

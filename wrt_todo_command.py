@@ -18,19 +18,14 @@ def handle_todo_command(user, text, team_domain):
         #check if this is a tagged todo item
         m = re.search(r"^\[([^\]]*)\](.*)$", text);
         if m and len(m.group(1).strip()) > 0 and len(m.group(2).strip()) > 0:
-            #check if this todo item has been assigned to anyone
-            n = re.findall("(?<=@)\w+|(?<=\()\w+(?=\))", text)
-            #check that every found mention does exist
-            for i in n:
-                if not i in wrt_names_to_ids:
-                    return respond(None, "I don't know who \"%s\" is" % i)
-            #notify everyone in that message that a todo item has been handed to them
-
-            notification = "%s has given you a todo item in [%s]:\n  - %s" % (wrt_ids_to_names[user] if user in wrt_ids_to_names else user, m.group(1).strip(), m.group(2).strip())
-            for i in n:
-                send_dm(wrt_names_to_ids[i], notification)
-
-            return add_todo_item(user, m.group(2).strip(), m.group(1).strip());
+            #check if there exist multiple todo items
+            n = re.findall('(?<={)[^}]+(?=})', m.group(2).strip())
+            if(len(n) == 0):
+                return add_todo_item(user, m.group(2).strip(), m.group(1).strip());
+            else:
+                for i in n:
+                    add_todo_item(user, i, m.group(1).strip())
+                return "added %i todo items" % len(n)
         return add_todo_item(user, text)
 
 def get_all_todo_items_pretty(user):
@@ -129,6 +124,19 @@ def delete_todo_by_index(user, index):
     return respond(None, "index out of range")
 
 def add_todo_item(user, text, tag = None):
+    #check if this todo item has been assigned to anyone
+    if tag:
+        n = re.findall("(?<=@)\w+|(?<=\()\w+(?=\))", text)
+        #check that every found mention does exist
+        for i in n:
+            if not i in wrt_names_to_ids:
+                return respond(None, "I don't know who \"%s\" is" % i)
+        #notify everyone in that message that a todo item has been handed to them
+
+        notification = "%s has given you a todo item in [%s]:\n  - %s" % (wrt_ids_to_names[user] if user in wrt_ids_to_names else user, tag, text)
+        for i in n:
+            send_dm(wrt_names_to_ids[i], notification)
+
     item = text
     time_added = decimal.Decimal(time.time())
     Item = { 

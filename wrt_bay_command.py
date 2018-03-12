@@ -5,6 +5,7 @@ import json
 import random
 
 from wrt_slack_handler import get_status, set_status, api_handler
+from wrt_help_messages import bay_help
 
 def handle_bay_command(user, text, team_domain):
     if text == "":
@@ -31,6 +32,8 @@ def handle_bay_command(user, text, team_domain):
         status_emoji = random.choice(BAY_LEAVE_EMOJI_LIST);
         status_text = random.choice(BAY_LEAVE_STATUS_LIST)
         return respond(None, "%s" % set_current_status(user,team_domain,status_text,status_emoji))
+    elif text == "help":
+        return respond(None, bay_help)
     else:
         return respond(None, "%s" % set_current_status(user,team_domain,text,':rocket:'))
 

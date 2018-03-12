@@ -10,6 +10,7 @@ PYTHON_FILES += wrt_respond.py
 PYTHON_FILES += wrt_todo_command.py
 PYTHON_FILES += wrt_slack_handler.py
 PYTHON_FILES += wrt_usernames.py
+PYTHON_FILES += wrt_help_messages.py
 
 .PHONY: all
 all:

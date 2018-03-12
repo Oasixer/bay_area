@@ -7,10 +7,13 @@ from wrt_dynamodb_handler import *
 from wrt_usernames import wrt_names_to_ids, wrt_ids_to_names
 from wrt_lists import channels_map
 from wrt_slack_handler import send_dm
+from wrt_help_messages import todo_help
 
 def handle_todo_command(user, text, team_domain):
     if text == "":
         return get_all_todo_items_pretty(user)
+    elif text == "help":
+        return respond(None, todo_help)
     elif text == "clear":
         return clear_todo_items(user)
     elif text.startswith("remove") and len(text.split(' ')) == 2 and text.split(' ')[1].isdigit():

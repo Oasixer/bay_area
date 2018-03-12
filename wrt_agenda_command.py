@@ -7,6 +7,7 @@ from wrt_dynamodb_handler import *
 from wrt_lists import *
 from wrt_respond import *
 from wrt_slack_handler import post_to_general
+from wrt_help_messages import agenda_help
 
 
 def handle_agenda_command(user, user_name, text, team_domain):
@@ -20,6 +21,8 @@ def handle_agenda_command(user, user_name, text, team_domain):
         return clear_all_items()
     elif text.startswith("remove") and len(text.split(' ')) == 2 and text.split(' ')[1].isdigit():
 		return delete_item_by_index(user, user_name, int(text.split(' ')[1]) - 1)
+    elif text == "help":
+        return respond(None, agenda_help)
     else:
         return put_item_in_agenda(text, user_name)
 

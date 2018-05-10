@@ -29,6 +29,7 @@ BAY_LEAVE_EMOJI_LIST = [":feelsbadman:",
 ignore_list = [] # Users in this list (identified by user ID) will not show up in "/bay who"
 
 agenda_react_emojis = [
+":_partyparrot",
 ":_anguished:", ":_blush:", ":_disappointed:", ":_eyes:", ":_fearful:",
 ":_heart:", ":_heart_eyes:", ":_kissing_heart:", ":_neutral_face:",
 ":_no_mouth:", ":_open_mouth:", ":_pensive:", ":_scream:", ":_smile:",
